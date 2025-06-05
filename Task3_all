@@ -1,0 +1,204 @@
+package JavaJingMing;
+
+import java.util.InputMismatchException;
+import java.util.Scanner;
+
+// --- Task 3: ATM Interface ---
+
+// 4. Create a class to represent the user's bank account, which stores the account balance.
+// (Also includes methods for deposit/withdraw as per step 3 and validation as per step 6 & 7)
+class BankAccount {
+    private String accountNumber;
+    private String userPin;
+    private double balance;
+
+    public BankAccount(String accountNumber, String userPin, double initialBalance) {
+        this.accountNumber = accountNumber;
+        this.userPin = userPin;
+        this.balance = initialBalance;
+    }
+
+    public String getAccountNumber() {
+        return accountNumber;
+    }
+
+    public String getUserPin() {
+        return userPin;
+    }
+
+    public double getBalance() {
+        return balance;
+    }
+
+    // 3. Implement method: deposit(amount)
+    // 6. Validate user input (amount > 0)
+    // 7. Display appropriate messages
+    public void deposit(double amount) {
+        if (amount > 0) {
+            balance += amount;
+            System.out.println("Deposit successful. New balance: Rs " + String.format("%.2f", balance));
+        } else {
+            System.out.println("Deposit amount must be positive. Transaction cancelled.");
+        }
+    }
+
+    // 3. Implement method: withdraw(amount)
+    // 6. Validate user input (amount > 0 and sufficient balance)
+    // 7. Display appropriate messages
+    public boolean withdraw(double amount) {
+        if (amount <= 0) {
+            System.out.println("Withdrawal amount must be positive. Transaction cancelled.");
+            return false;
+        }
+        if (balance >= amount) { // Validate sufficient balance
+            balance -= amount;
+            System.out.println("Withdrawal successful. New balance: Rs " + String.format("%.2f", balance));
+            return true;
+        } else {
+            System.out.println("Insufficient balance. Current balance: Rs " + String.format("%.2f", balance));
+            return false;
+        }
+    }
+}
+
+// 1. Create a class to represent the ATM machine.
+// (Also includes design, methods, connection, validation, messages for steps 2,3,5,6,7)
+class ATM {
+    // 5. Connect the ATM class with the user's bank account class
+    private BankAccount currentAccount;
+    private Scanner atmScanner;
+
+    public ATM(Scanner sharedScanner) { // The main scanner from ATMSimulator
+        this.atmScanner = sharedScanner;
+        System.out.println("ATM machine initialized.");
+    }
+
+    public void start() {
+        System.out.println("\n--- Welcome to the ATM ---");
+
+        // For demonstration purposes: A hardcoded dummy account.
+        // In a real application, accounts would be loaded from a database.
+        BankAccount dummyAccount = new BankAccount("123456789", "1234", 1000.00);
+
+        System.out.print("Please enter your Account Number: ");
+        String enteredAccountNumber = atmScanner.nextLine();
+
+        System.out.print("Please enter your PIN: ");
+        String enteredPin = atmScanner.nextLine();
+
+        // 7. Display appropriate messages for login success/failure
+        if (enteredAccountNumber.equals(dummyAccount.getAccountNumber()) &&
+            enteredPin.equals(dummyAccount.getUserPin())) {
+            this.currentAccount = dummyAccount; // Connection established
+            System.out.println("Login successful. Welcome, Account " + currentAccount.getAccountNumber() + "!");
+            runAtmOperations(); // Proceed to main ATM operations
+        } else {
+            System.out.println("Invalid Account Number or PIN. Access denied.");
+        }
+    }
+
+    // 2. Design the user interface for the ATM
+    private void runAtmOperations() {
+        int choice;
+        do {
+            displayMenu(); // Display menu options
+            System.out.print("Enter your choice: ");
+            try {
+                choice = atmScanner.nextInt();
+                atmScanner.nextLine(); // Consume newline left-over after nextInt()
+
+                switch (choice) {
+                    case 1:
+                        checkBalance(); // 3. Implement checkBalance()
+                        break;
+                    case 2:
+                        deposit();      // 3. Implement deposit()
+                        break;
+                    case 3:
+                        withdraw();     // 3. Implement withdraw()
+                        break;
+                    case 4:
+                        System.out.println("Thank you for using the ATM. Goodbye!"); // 7. Exit message
+                        break;
+                    default:
+                        System.out.println("Invalid choice. Please select a valid option (1-4)."); // 7. Invalid choice message
+                }
+            } catch (InputMismatchException e) { // 6. Validate user input (for menu choice)
+                System.out.println("Invalid input. Please enter a number corresponding to your choice."); // 7. Invalid input message
+                atmScanner.nextLine(); // Consume the invalid input to prevent infinite loop
+                choice = 0; // Set choice to 0 to re-display menu and prompt
+            }
+        } while (choice != 4); // Loop until user chooses to exit
+    }
+
+    // 2. Design the user interface (menu display)
+    private void displayMenu() {
+        System.out.println("\n--- ATM Menu ---");
+        System.out.println("1. Check Balance");
+        System.out.println("2. Deposit");
+        System.out.println("3. Withdraw");
+        System.out.println("4. Exit");
+        System.out.println("-----------------");
+    }
+
+    // 3. Implement method: checkBalance()
+    // 7. Display appropriate messages
+    private void checkBalance() {
+        if (currentAccount != null) {
+            System.out.println("Your current balance is: Rs " + String.format("%.2f", currentAccount.getBalance()));
+        } else {
+            System.out.println("Error: No account logged in. Please restart ATM."); // Should not happen after successful login
+        }
+    }
+
+    // 3. Implement method: deposit()
+    // 6. Validate user input (amount type)
+    // 7. Display appropriate messages (calls BankAccount.deposit which has messages)
+    private void deposit() {
+        if (currentAccount == null) {
+            System.out.println("Error: No account logged in. Please restart ATM.");
+            return;
+        }
+        System.out.print("Enter amount to deposit: Rs ");
+        try {
+            double amount = atmScanner.nextDouble();
+            atmScanner.nextLine(); // Consume newline
+            currentAccount.deposit(amount); // Uses BankAccount's deposit method with its validation/messages
+        } catch (InputMismatchException e) { // Handles non-numeric input for amount
+            System.out.println("Invalid amount. Please enter a numeric value.");
+            atmScanner.nextLine(); // Consume invalid input
+        }
+    }
+
+    // 3. Implement method: withdraw()
+    // 6. Validate user input (amount type and calls BankAccount.withdraw for balance validation)
+    // 7. Display appropriate messages (calls BankAccount.withdraw which has messages)
+    private void void withdraw() {
+        if (currentAccount == null) {
+            System.out.println("Error: No account logged in. Please restart ATM.");
+            return;
+        }
+        System.out.print("Enter amount to withdraw: Rs ");
+        try {
+            double amount = atmScanner.nextDouble();
+            atmScanner.nextLine(); // Consume newline
+            currentAccount.withdraw(amount); // Uses BankAccount's withdraw method with its validation/messages
+        } catch (InputMismatchException e) { // Handles non-numeric input for amount
+            System.out.println("Invalid amount. Please enter a numeric value.");
+            atmScanner.nextLine(); // Consume invalid input
+        }
+    }
+}
+
+// Main class to run the ATM simulator
+public class ATMSimulator {
+    public static void main(String[] args) {
+        Scanner mainScanner = new Scanner(System.in); // Create one scanner for the application
+        ATM atm = new ATM(mainScanner); // Pass the scanner to the ATM
+        atm.start(); // Start the ATM operations
+
+        // Close the scanner only when the entire application is done
+        mainScanner.close();
+        System.out.println("\nApplication exited.");
+    }
+}
