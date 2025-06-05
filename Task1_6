@@ -1,0 +1,121 @@
+package JavaJingMing;
+
+import java.util.Random;
+import java.util.Scanner;
+
+public class CodSoftT1 {
+
+    // You can make this a constant or pass it as a parameter if you want it configurable
+    private static final int MAX_ATTEMPTS = 5; // For example, give the user 5 attempts
+
+    public static void guessTheNumberGame(int min, int max) {
+        if (min > max) {
+            System.out.println("Oops! The minimum value can't be greater than the maximum value. Please try again.");
+            // No return here, as we might want to let the main method handle retrying range input.
+            // For now, it's handled by main.
+            return;
+        }
+
+        Random random = new Random();
+        // Generate a random integer between min (inclusive) and max (inclusive)
+        int randomNumber = random.nextInt((max - min) + 1) + min;
+
+        Scanner s = new Scanner(System.in); // Create scanner inside the game method
+        System.out.println("\nI've generated a random number between " + min + " and " + max + ".");
+        System.out.println("You have " + MAX_ATTEMPTS + " attempts to guess it. Good luck!");
+
+        int userGuess; // Declare userGuess outside the loop
+        int attempts = 0; // Initialize attempts counter
+        boolean hasGuessedCorrectly = false; // Flag to control the loop
+
+        // Loop as long as the user hasn't guessed correctly AND they have attempts left
+        while (!hasGuessedCorrectly && attempts < MAX_ATTEMPTS) {
+            System.out.print("Attempt " + (attempts + 1) + "/" + MAX_ATTEMPTS + ". Enter your guess: ");
+            // Input validation: ensure it's an integer
+            if (s.hasNextInt()) {
+                userGuess = s.nextInt(); // Read the user's guess
+                attempts++; // Increment attempts after each guess
+
+                // Compare the user's guess with the generated number and provide feedback
+                if (userGuess == randomNumber) {
+                    System.out.println("Congratulations! You guessed the number " + randomNumber + " correctly in " + attempts + " attempts!");
+                    hasGuessedCorrectly = true; // Set flag to true to exit the loop
+                } else if (userGuess < randomNumber) {
+                    System.out.println("Your guess (" + userGuess + ") is too low. ");
+                } else { // userGuess > randomNumber
+                    System.out.println("Your guess (" + userGuess + ") is too high. ");
+                }
+
+                // Provide feedback on remaining attempts if not guessed correctly and attempts are left
+                if (!hasGuessedCorrectly && attempts < MAX_ATTEMPTS) {
+                    System.out.println("You have " + (MAX_ATTEMPTS - attempts) + " attempts remaining.");
+                }
+            } else {
+                System.out.println("Invalid input. Please enter a whole number.");
+                s.next(); // Consume the invalid input to prevent an infinite loop
+                // Do not increment attempts for invalid input, allowing user to re-enter
+            }
+        }
+
+        // After the loop, check if the user failed to guess within the attempts
+        if (!hasGuessedCorrectly) {
+            System.out.println("\nSorry, you've run out of attempts!");
+            System.out.println("The number I was thinking of was: " + randomNumber);
+        }
+
+       
+        s.close();
+    }
+
+    public static void main(String[] args) {
+        Scanner mainScanner = new Scanner(System.in); // Use a distinct name for main's scanner
+        boolean playAgain;
+
+        System.out.println("Welcome to the Number Guessing Game!");
+
+        do {
+            System.out.println("\n--- Starting a new round ---");
+            int minRange, maxRange;
+
+            // Loop for valid range input
+            while (true) {
+                System.out.print("Enter the minimum number for the range: ");
+                if (mainScanner.hasNextInt()) {
+                    minRange = mainScanner.nextInt();
+                } else {
+                    System.out.println("Invalid input. Please enter a whole number for the minimum range.");
+                    mainScanner.next(); // Consume invalid input
+                    continue; // Ask for min range again
+                }
+
+                System.out.print("Enter the maximum number for the range: ");
+                if (mainScanner.hasNextInt()) {
+                    maxRange = mainScanner.nextInt();
+                } else {
+                    System.out.println("Invalid input. Please enter a whole number for the maximum range.");
+                    mainScanner.next(); // Consume invalid input
+                    continue; // Ask for max range again
+                }
+
+                if (minRange > maxRange) {
+                    System.out.println("Error: Minimum value cannot be greater than maximum value. Please re-enter the range.");
+                } else {
+                    break; // Valid range, exit range input loop
+                }
+            }
+
+            // Call the game method with the user-defined range
+            guessTheNumberGame(minRange, maxRange);
+
+            // Ask the user if they want to play again
+            System.out.print("Do you want to play another round? (yes/no): ");
+            String playAgainInput = mainScanner.next().toLowerCase(); // Read input and convert to lowercase
+
+            playAgain = playAgainInput.equals("yes"); // Set playAgain based on user input
+
+        } while (playAgain); // Continue loop if playAgain is true
+
+        System.out.println("Thank you for playing! Goodbye!");
+        mainScanner.close(); // Close the main method's scanner when the program exits
+    }
+}
