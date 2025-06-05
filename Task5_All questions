@@ -1,0 +1,848 @@
+package JavaJingMing;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.InputMismatchException;
+import java.util.Scanner;
+import org.json.JSONObject; // You'll need to add this dependency (e.g., org.json)
+
+public class CurrencyConverter {
+
+  
+   
+    package JavaJingMing;
+
+import java.io.*; // For file I/O
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.InputMismatchException;
+import java.util.List;
+import java.util.Random;
+import java.util.Scanner;
+import org.json.JSONObject; // You need to add this dependency (e.g., org.json)
+
+public class AppRunner {
+
+    // --- Constants shared across tasks if needed ---
+    private static final int GUESSING_GAME_MAX_ATTEMPTS = 5;
+    // API details for Currency Converter (TASK 4)
+    private static final String CURRENCY_API_KEY = "YOUR_API_KEY_HERE"; // <<<--- REPLACE THIS!!!
+    private static final String CURRENCY_API_BASE_URL = "https://v6.exchangerate-api.com/v6/";
+
+
+    // --- 1. TASK: Number Guessing Game ---
+    // (Methods from previous responses, slightly refactored for integration)
+
+    public static boolean runNumberGuessingGameRound(int min, int max, Scanner scanner) {
+        if (min > max) {
+            System.out.println("Oops! The minimum value can't be greater than the maximum value. Cannot start game.");
+            return false;
+        }
+
+        Random random = new Random();
+        int randomNumber = random.nextInt((max - min) + 1) + min;
+
+        System.out.println("\nI've generated a random number between " + min + " and " + max + ".");
+        System.out.println("You have " + GUESSING_GAME_MAX_ATTEMPTS + " attempts to guess it. Good luck!");
+
+        int userGuess;
+        int attempts = 0;
+        boolean hasGuessedCorrectly = false;
+
+        while (!hasGuessedCorrectly && attempts < GUESSING_GAME_MAX_ATTEMPTS) {
+            System.out.print("Attempt " + (attempts + 1) + "/" + GUESSING_GAME_MAX_ATTEMPTS + ". Enter your guess: ");
+            try {
+                userGuess = scanner.nextInt();
+                scanner.nextLine(); // Consume newline
+
+                attempts++;
+
+                if (userGuess == randomNumber) {
+                    System.out.println("Congratulations! You guessed the number " + randomNumber + " correctly in " + attempts + " attempts!");
+                    hasGuessedCorrectly = true;
+                } else if (userGuess < randomNumber) {
+                    System.out.println("Your guess (" + userGuess + ") is too low. ");
+                } else { // userGuess > randomNumber
+                    System.out.println("Your guess (" + userGuess + ") is too high. ");
+                }
+
+                if (!hasGuessedCorrectly && attempts < GUESSING_GAME_MAX_ATTEMPTS) {
+                    System.out.println("You have " + (GUESSING_GAME_MAX_ATTEMPTS - attempts) + " attempts remaining.");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter a whole number.");
+                scanner.nextLine(); // Consume invalid input
+            }
+        }
+
+        if (!hasGuessedCorrectly) {
+            System.out.println("\nSorry, you've run out of attempts!");
+            System.out.println("The number I was thinking of was: " + randomNumber);
+        }
+        return hasGuessedCorrectly;
+    }
+
+    public static void runNumberGuessingGame(Scanner scanner) {
+        System.out.println("\n--- Welcome to the Number Guessing Game (Task 1) ---");
+        boolean playAgain;
+        int roundsWon = 0;
+        int totalRoundsPlayed = 0;
+
+        do {
+            System.out.println("\n--- Starting a new round ---");
+            int minRange, maxRange;
+
+            while (true) {
+                System.out.print("Enter the minimum number for the range: ");
+                try {
+                    minRange = scanner.nextInt();
+                    scanner.nextLine(); // Consume newline
+                } catch (InputMismatchException e) {
+                    System.out.println("Invalid input. Please enter a whole number.");
+                    scanner.nextLine(); // Consume invalid input
+                    continue;
+                }
+
+                System.out.print("Enter the maximum number for the range: ");
+                try {
+                    maxRange = scanner.nextInt();
+                    scanner.nextLine(); // Consume newline
+                } catch (InputMismatchException e) {
+                    System.out.println("Invalid input. Please enter a whole number.");
+                    scanner.nextLine(); // Consume invalid input
+                    continue;
+                }
+
+                if (minRange > maxRange) {
+                    System.out.println("Error: Minimum value cannot be greater than maximum value. Please re-enter the range.");
+                } else {
+                    break;
+                }
+            }
+
+            totalRoundsPlayed++;
+            if (runNumberGuessingGameRound(minRange, maxRange, scanner)) {
+                roundsWon++;
+            }
+
+            System.out.print("Do you want to play another round? (yes/no): ");
+            String playAgainInput = scanner.nextLine().toLowerCase();
+            playAgain = playAgainInput.equals("yes");
+
+        } while (playAgain);
+
+        System.out.println("\n--- Game Over ---");
+        System.out.println("You played " + totalRoundsPlayed + " rounds.");
+        System.out.println("Your score: You won " + roundsWon + " out of " + totalRoundsPlayed + " rounds!");
+    }
+
+
+    // --- 2. TASK: Student Grade Calculator ---
+    // (Methods from previous responses, now inside the main class)
+    public static void runStudentGradeCalculator(Scanner scanner) {
+        System.out.println("\n--- Student Grade Calculator (Task 2) ---");
+
+        int numberOfSubjects;
+        while (true) {
+            System.out.print("Enter the number of subjects: ");
+            try {
+                numberOfSubjects = scanner.nextInt();
+                scanner.nextLine(); // Consume newline
+                if (numberOfSubjects <= 0) {
+                    System.out.println("Number of subjects must be greater than zero. Please try again.");
+                } else {
+                    break;
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter a whole number.");
+                scanner.nextLine(); // Consume the invalid input
+            }
+        }
+
+        int totalMarks = 0;
+        for (int i = 1; i <= numberOfSubjects; i++) {
+            int marks;
+            while (true) {
+                System.out.print("Enter marks for Subject " + i + " (out of 100): ");
+                try {
+                    marks = scanner.nextInt();
+                    scanner.nextLine(); // Consume newline
+                    if (marks < 0 || marks > 100) {
+                        System.out.println("Marks must be between 0 and 100. Please re-enter.");
+                    } else {
+                        totalMarks += marks;
+                        break;
+                    }
+                } catch (InputMismatchException e) {
+                    System.out.println("Invalid input. Please enter a whole number for marks.");
+                    scanner.nextLine(); // Consume the invalid input
+                }
+            }
+        }
+
+        double averagePercentage = (double) totalMarks / numberOfSubjects;
+
+        char grade;
+        if (averagePercentage >= 90) {
+            grade = 'A';
+        } else if (averagePercentage >= 80) {
+            grade = 'B';
+        } else if (averagePercentage >= 70) {
+            grade = 'C';
+        } else if (averagePercentage >= 60) {
+            grade = 'D';
+        } else {
+            grade = 'F';
+        }
+
+        System.out.println("\n--- Results ---");
+        System.out.println("Total Marks: " + totalMarks + " / " + (numberOfSubjects * 100));
+        System.out.printf("Average Percentage: %.2f%%\n", averagePercentage);
+        System.out.println("Grade: " + grade);
+    }
+
+
+    // --- 3. TASK: ATM Interface ---
+    // (Classes and methods for ATM, nested as static classes inside AppRunner)
+
+    static class BankAccount {
+        private String accountNumber;
+        private String userPin;
+        private double balance;
+
+        public BankAccount(String accountNumber, String userPin, double initialBalance) {
+            this.accountNumber = accountNumber;
+            this.userPin = userPin;
+            this.balance = initialBalance;
+        }
+
+        public String getAccountNumber() { return accountNumber; }
+        public String getUserPin() { return userPin; }
+        public double getBalance() { return balance; }
+
+        public void deposit(double amount) {
+            if (amount > 0) {
+                balance += amount;
+                System.out.println("Deposit successful. New balance: Rs " + String.format("%.2f", balance));
+            } else {
+                System.out.println("Deposit amount must be positive. Transaction cancelled.");
+            }
+        }
+
+        public boolean withdraw(double amount) {
+            if (amount <= 0) {
+                System.out.println("Withdrawal amount must be positive. Transaction cancelled.");
+                return false;
+            }
+            if (balance >= amount) {
+                balance -= amount;
+                System.out.println("Withdrawal successful. New balance: Rs " + String.format("%.2f", balance));
+                return true;
+            } else {
+                System.out.println("Insufficient balance. Current balance: Rs " + String.format("%.2f", balance));
+                return false;
+            }
+        }
+    }
+
+    static class ATM {
+        private BankAccount currentAccount;
+        private Scanner atmScanner;
+
+        public ATM(Scanner sharedScanner) {
+            this.atmScanner = sharedScanner;
+            System.out.println("ATM machine initialized.");
+        }
+
+        public void start() {
+            System.out.println("\n--- Welcome to the ATM (Task 3) ---");
+            BankAccount dummyAccount = new BankAccount("123456789", "1234", 1000.00);
+
+            System.out.print("Please enter your Account Number: ");
+            String enteredAccountNumber = atmScanner.nextLine();
+
+            System.out.print("Please enter your PIN: ");
+            String enteredPin = atmScanner.nextLine();
+
+            if (enteredAccountNumber.equals(dummyAccount.getAccountNumber()) &&
+                enteredPin.equals(dummyAccount.getUserPin())) {
+                this.currentAccount = dummyAccount;
+                System.out.println("Login successful. Welcome, Account " + currentAccount.getAccountNumber() + "!");
+                runAtmOperations();
+            } else {
+                System.out.println("Invalid Account Number or PIN. Access denied.");
+            }
+        }
+
+        private void runAtmOperations() {
+            int choice;
+            do {
+                displayMenu();
+                System.out.print("Enter your choice: ");
+                try {
+                    choice = atmScanner.nextInt();
+                    atmScanner.nextLine(); // Consume newline
+
+                    switch (choice) {
+                        case 1: checkBalance(); break;
+                        case 2: deposit(); break;
+                        case 3: withdraw(); break;
+                        case 4: System.out.println("Thank you for using the ATM. Goodbye!"); break;
+                        default: System.out.println("Invalid choice. Please select a valid option (1-4).");
+                    }
+                } catch (InputMismatchException e) {
+                    System.out.println("Invalid input. Please enter a number corresponding to your choice.");
+                    atmScanner.nextLine(); // Consume invalid input
+                    choice = 0;
+                }
+            } while (choice != 4);
+        }
+
+        private void displayMenu() {
+            System.out.println("\n--- ATM Menu ---");
+            System.out.println("1. Check Balance");
+            System.out.println("2. Deposit");
+            System.out.println("3. Withdraw");
+            System.out.println("4. Exit");
+            System.out.println("-----------------");
+        }
+
+        private void checkBalance() {
+            if (currentAccount != null) {
+                System.out.println("Your current balance is: Rs " + String.format("%.2f", currentAccount.getBalance()));
+            } else {
+                System.out.println("Error: No account logged in.");
+            }
+        }
+
+        private void deposit() {
+            if (currentAccount == null) { System.out.println("Error: No account logged in."); return; }
+            System.out.print("Enter amount to deposit: Rs ");
+            try {
+                double amount = atmScanner.nextDouble();
+                atmScanner.nextLine(); // Consume newline
+                currentAccount.deposit(amount);
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid amount. Please enter a numeric value.");
+                atmScanner.nextLine();
+            }
+        }
+
+        private void withdraw() {
+            if (currentAccount == null) { System.out.println("Error: No account logged in."); return; }
+            System.out.print("Enter amount to withdraw: Rs ");
+            try {
+                double amount = atmScanner.nextDouble();
+                atmScanner.nextLine(); // Consume newline
+                currentAccount.withdraw(amount);
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid amount. Please enter a numeric value.");
+                atmScanner.nextLine();
+            }
+        }
+    }
+
+
+    // --- 4. TASK: Currency Converter ---
+    // (Updated to use ExchangeRate-API and integrated as a callable method)
+
+    public static void runCurrencyConverter(Scanner scanner) {
+        System.out.println("\n--- Welcome to the Currency Converter (Task 4) ---");
+        System.out.println("Powered by ExchangeRate-API.com (requires your API Key)");
+
+        if (CURRENCY_API_KEY.equals("YOUR_API_KEY_HERE")) {
+            System.err.println("CRITICAL ERROR: Please replace 'YOUR_API_KEY_HERE' in the code with your actual API key from exchangerate-api.com!");
+            return;
+        }
+
+        String baseCurrency;
+        String targetCurrency;
+        double amountToConvert;
+
+        System.out.print("Enter the base currency code (e.g., USD, EUR, INR): ");
+        baseCurrency = scanner.nextLine().toUpperCase();
+
+        System.out.print("Enter the target currency code (e.g., JPY, GBP, AUD): ");
+        targetCurrency = scanner.nextLine().toUpperCase();
+
+        System.out.print("Enter the amount to convert: ");
+        try {
+            amountToConvert = scanner.nextDouble();
+            scanner.nextLine(); // Consume newline
+
+            if (amountToConvert <= 0) {
+                System.out.println("Amount must be positive. Conversion cancelled.");
+                return;
+            }
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid amount. Please enter a numeric value.");
+            scanner.nextLine(); // Consume invalid input
+            return;
+        }
+
+        try {
+            double exchangeRate = fetchExchangeRate(baseCurrency, targetCurrency);
+
+            if (exchangeRate > 0) {
+                double convertedAmount = amountToConvert * exchangeRate;
+                System.out.printf("\nConverting %.2f %s to %s...\n", amountToConvert, baseCurrency, targetCurrency);
+                System.out.printf("Exchange Rate (1 %s = %.4f %s)\n", baseCurrency, exchangeRate, targetCurrency);
+                System.out.printf("Converted Amount: %.2f %s\n", convertedAmount, targetCurrency);
+            } else {
+                System.out.println("Failed to retrieve exchange rates. Please check currency codes or API key.");
+            }
+        } catch (Exception e) {
+            System.err.println("An unexpected error occurred during currency conversion: " + e.getMessage());
+            System.out.println("Please ensure you have an internet connection and a valid API key.");
+            // e.printStackTrace(); // Uncomment for full debugging stack trace
+        }
+        System.out.println("--- Currency Converter Finished ---");
+    }
+
+    private static double fetchExchangeRate(String baseCurrency, String targetCurrency) throws Exception {
+        String urlString = CURRENCY_API_BASE_URL + CURRENCY_API_KEY + "/latest/" + baseCurrency;
+        URL url = new URL(urlString);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        connection.setConnectTimeout(5000);
+        connection.setReadTimeout(5000);
+
+        int responseCode = connection.getResponseCode();
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            StringBuilder response = new StringBuilder();
+            String inputLine;
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+
+            JSONObject jsonResponse = new JSONObject(response.toString());
+
+            if ("success".equals(jsonResponse.getString("result"))) {
+                JSONObject conversionRates = jsonResponse.getJSONObject("conversion_rates");
+                if (conversionRates.has(targetCurrency)) {
+                    return conversionRates.getDouble(targetCurrency);
+                } else {
+                    System.err.println("Error: Target currency '" + targetCurrency + "' not found in API response.");
+                    return -1.0;
+                }
+            } else {
+                String errorType = jsonResponse.optString("error-type", "unknown_error");
+                System.err.println("API returned an error: " + errorType);
+                System.err.println("Full API response: " + response.toString());
+                return -1.0;
+            }
+        } else {
+            System.err.println("API Request Failed. HTTP Response Code: " + responseCode);
+            try (BufferedReader errorReader = new BufferedReader(new InputStreamReader(connection.getErrorStream()))) {
+                StringBuilder errorResponse = new StringBuilder();
+                String errorLine;
+                while ((errorLine = errorReader.readLine()) != null) {
+                    errorResponse.append(errorLine);
+                }
+                if (errorResponse.length() > 0) {
+                    System.err.println("API Error Details: " + errorResponse.toString());
+                }
+            }
+            return -1.0;
+        }
+    }
+
+
+    // --- 5. TASK: Student Management System ---
+
+    // 1. Create a Student class
+    static class Student {
+        private String rollNumber;
+        private String name;
+        private char grade;
+        private String email; // Added as another relevant detail
+
+        public Student(String rollNumber, String name, char grade, String email) {
+            this.rollNumber = rollNumber;
+            this.name = name;
+            this.grade = grade;
+            this.email = email;
+        }
+
+        // Getters
+        public String getRollNumber() { return rollNumber; }
+        public String getName() { return name; }
+        public char getGrade() { return grade; }
+        public String getEmail() { return email; }
+
+        // Setters (for editing)
+        public void setName(String name) { this.name = name; }
+        public void setGrade(char grade) { this.grade = grade; }
+        public void setEmail(String email) { this.email = email; }
+
+        @Override
+        public String toString() {
+            return "Roll No: " + rollNumber + ", Name: " + name + ", Grade: " + grade + ", Email: " + email;
+        }
+
+        // Method to convert Student object to a file-friendly string format
+        public String toFileString() {
+            return rollNumber + "," + name + "," + grade + "," + email;
+        }
+
+        // Static method to parse a string from file back into a Student object
+        public static Student fromFileString(String line) {
+            String[] parts = line.split(",", 4); // Limit split to 4 parts
+            if (parts.length == 4) {
+                return new Student(parts[0], parts[1], parts[2].charAt(0), parts[3]);
+            }
+            return null; // Invalid format
+        }
+    }
+
+    // 2. Implement a StudentManagementSystem class
+    static class StudentManagementSystem {
+        private List<Student> students;
+        private static final String FILENAME = "students.txt"; // For data persistence
+
+        public StudentManagementSystem() {
+            this.students = new ArrayList<>();
+            loadStudentsFromFile(); // Load existing students on system initialization
+        }
+
+        // 5. Option: Adding a new student
+        // 6. Input validation (for roll number uniqueness, not empty)
+        public void addStudent(Student student) {
+            // Validate if roll number already exists
+            for (Student s : students) {
+                if (s.getRollNumber().equalsIgnoreCase(student.getRollNumber())) {
+                    System.out.println("Error: Student with Roll Number '" + student.getRollNumber() + "' already exists.");
+                    return;
+                }
+            }
+            students.add(student);
+            System.out.println("Student '" + student.getName() + "' added successfully.");
+        }
+
+        // 5. Option: Removing a student
+        public boolean removeStudent(String rollNumber) {
+            // Find student by roll number (case-insensitive)
+            boolean removed = students.removeIf(s -> s.getRollNumber().equalsIgnoreCase(rollNumber));
+            if (removed) {
+                System.out.println("Student with Roll Number '" + rollNumber + "' removed successfully.");
+            } else {
+                System.out.println("Error: Student with Roll Number '" + rollNumber + "' not found.");
+            }
+            return removed;
+        }
+
+        // 5. Option: Searching for a student
+        public List<Student> searchStudent(String query) {
+            List<Student> results = new ArrayList<>();
+            String lowerCaseQuery = query.toLowerCase();
+            for (Student s : students) {
+                // Search by roll number or name (case-insensitive, partial match)
+                if (s.getRollNumber().toLowerCase().contains(lowerCaseQuery) ||
+                    s.getName().toLowerCase().contains(lowerCaseQuery)) {
+                    results.add(s);
+                }
+            }
+            if (results.isEmpty()) {
+                System.out.println("No students found matching '" + query + "'.");
+            } else {
+                System.out.println("Found " + results.size() + " student(s) matching '" + query + "':");
+            }
+            return results;
+        }
+
+        // 5. Option: Displaying all students
+        public void displayAllStudents() {
+            if (students.isEmpty()) {
+                System.out.println("No students in the system.");
+                return;
+            }
+            System.out.println("\n--- All Students ---");
+            for (int i = 0; i < students.size(); i++) {
+                System.out.println((i + 1) + ". " + students.get(i));
+            }
+            System.out.println("--------------------");
+        }
+
+        // 5. Option: Editing an existing student's information
+        // 6. Input validation (for empty fields, correct format)
+        public void editStudent(String rollNumber, Scanner scanner) {
+            Student studentToEdit = null;
+            for (Student s : students) {
+                if (s.getRollNumber().equalsIgnoreCase(rollNumber)) {
+                    studentToEdit = s;
+                    break;
+                }
+            }
+
+            if (studentToEdit == null) {
+                System.out.println("Error: Student with Roll Number '" + rollNumber + "' not found.");
+                return;
+            }
+
+            System.out.println("\n--- Editing Student: " + studentToEdit.getName() + " (Roll No: " + studentToEdit.getRollNumber() + ") ---");
+            System.out.println("Current Details: " + studentToEdit);
+
+            String newName;
+            do {
+                System.out.print("Enter new Name (current: " + studentToEdit.getName() + ", leave blank to keep): ");
+                newName = scanner.nextLine().trim();
+                if (!newName.isEmpty()) {
+                    studentToEdit.setName(newName);
+                }
+            } while (false); // Only one prompt for name
+
+            char newGrade;
+            while (true) {
+                System.out.print("Enter new Grade (current: " + studentToEdit.getGrade() + ", A/B/C/D/F, leave blank to keep): ");
+                String gradeInput = scanner.nextLine().trim().toUpperCase();
+                if (gradeInput.isEmpty()) {
+                    break; // Keep current grade
+                }
+                if (gradeInput.length() == 1 && "ABCDFU".contains(gradeInput)) { // U for unknown if needed
+                    studentToEdit.setGrade(gradeInput.charAt(0));
+                    break;
+                } else {
+                    System.out.println("Invalid grade. Please enter A, B, C, D, F, or leave blank.");
+                }
+            }
+
+            String newEmail;
+            do {
+                System.out.print("Enter new Email (current: " + studentToEdit.getEmail() + ", leave blank to keep): ");
+                newEmail = scanner.nextLine().trim();
+                if (!newEmail.isEmpty()) {
+                    // Basic email format check (can be more robust)
+                    if (newEmail.contains("@") && newEmail.contains(".")) {
+                        studentToEdit.setEmail(newEmail);
+                    } else {
+                        System.out.println("Warning: Email format seems invalid. It should contain '@' and '.'.");
+                        // User can still choose to keep it or re-enter
+                    }
+                }
+            } while (false); // Only one prompt for email
+
+
+            System.out.println("Student information updated successfully:");
+            System.out.println(studentToEdit);
+        }
+
+        // 4. Implement methods to read and write student data to a storage medium (file)
+        public void saveStudentsToFile() {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILENAME))) {
+                for (Student s : students) {
+                    writer.write(s.toFileString());
+                    writer.newLine();
+                }
+                System.out.println("Student data saved to " + FILENAME + " successfully.");
+            } catch (IOException e) {
+                System.err.println("Error saving student data to file: " + e.getMessage());
+            }
+        }
+
+        // 4. Implement methods to read and write student data to a storage medium (file)
+        public void loadStudentsFromFile() {
+            File file = new File(FILENAME);
+            if (!file.exists()) {
+                System.out.println("No existing student data file found. Starting with an empty system.");
+                return;
+            }
+            students.clear(); // Clear existing list before loading
+
+            try (BufferedReader reader = new BufferedReader(new FileReader(FILENAME))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    Student s = Student.fromFileString(line);
+                    if (s != null) {
+                        students.add(s);
+                    } else {
+                        System.err.println("Warning: Skipping malformed line in file: " + line);
+                    }
+                }
+                System.out.println("Student data loaded from " + FILENAME + " successfully. (" + students.size() + " students)");
+            } catch (FileNotFoundException e) {
+                System.err.println("Error: Student data file not found at " + FILENAME);
+            } catch (IOException e) {
+                System.err.println("Error reading student data from file: " + e.getMessage());
+            }
+        }
+    }
+
+
+    // --- Main Entry Point for the Entire Application ---
+    public static void main(String[] args) {
+        Scanner mainScanner = new Scanner(System.in);
+        int choice;
+
+        System.out.println("Welcome to the Unified Java Tasks Application!");
+
+        do {
+            System.out.println("\n------------------------------------");
+            System.out.println("Please choose a task to run:");
+            System.out.println("1. Number Guessing Game (Task 1)");
+            System.out.println("2. Student Grade Calculator (Task 2)");
+            System.out.println("3. ATM Interface (Task 3)");
+            System.out.println("4. Currency Converter (Task 4)");
+            System.out.println("5. Student Management System (Task 5)"); // New option
+            System.out.println("0. Exit Application");
+            System.out.println("------------------------------------");
+            System.out.print("Enter your choice: ");
+
+            try {
+                choice = mainScanner.nextInt();
+                mainScanner.nextLine(); // Consume newline
+
+                switch (choice) {
+                    case 1:
+                        runNumberGuessingGame(mainScanner);
+                        break;
+                    case 2:
+                        runStudentGradeCalculator(mainScanner);
+                        break;
+                    case 3:
+                        ATM atm = new ATM(mainScanner);
+                        atm.start();
+                        break;
+                    case 4:
+                        runCurrencyConverter(mainScanner);
+                        break;
+                    case 5: // Call the new SMS method
+                        runStudentManagementSystem(mainScanner);
+                        break;
+                    case 0:
+                        System.out.println("Exiting Application. Goodbye!");
+                        break;
+                    default:
+                        System.out.println("Invalid choice. Please enter a number from 0 to 5.");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter a number.");
+                mainScanner.nextLine(); // Consume the invalid input
+                choice = -1; // Set to invalid choice to loop again
+            } catch (Exception e) {
+                System.err.println("An unexpected error occurred: " + e.getMessage());
+                // e.printStackTrace(); // For debugging
+                choice = -1;
+            }
+
+        } while (choice != 0);
+
+        mainScanner.close(); // Close the main scanner when the application truly exits
+    }
+
+
+    // --- Method to run the Student Management System (Task 5 UI) ---
+    public static void runStudentManagementSystem(Scanner scanner) {
+        StudentManagementSystem sms = new StudentManagementSystem();
+        int smsChoice;
+
+        System.out.println("\n--- Welcome to the Student Management System (Task 5) ---");
+
+        do {
+            System.out.println("\n--- Student Management Menu ---");
+            System.out.println("1. Add New Student");
+            System.out.println("2. Remove Student");
+            System.out.println("3. Search Student");
+            System.out.println("4. Display All Students");
+            System.out.println("5. Edit Student Information");
+            System.out.println("6. Save Students to File");
+            System.out.println("7. Load Students from File (will overwrite current in-memory data)");
+            System.out.println("0. Back to Main Menu");
+            System.out.println("-----------------------------");
+            System.out.print("Enter your choice: ");
+
+            try {
+                smsChoice = scanner.nextInt();
+                scanner.nextLine(); // Consume newline
+
+                switch (smsChoice) {
+                    case 1: // Add Student
+                        System.out.print("Enter Roll Number: ");
+                        String rollNum = scanner.nextLine().trim();
+                        System.out.print("Enter Name: ");
+                        String name = scanner.nextLine().trim();
+                        System.out.print("Enter Grade (A, B, C, D, F): ");
+                        String gradeInput = scanner.nextLine().trim().toUpperCase();
+                        System.out.print("Enter Email: ");
+                        String email = scanner.nextLine().trim();
+
+                        // Input validation for adding a student (part of step 6)
+                        if (rollNum.isEmpty() || name.isEmpty() || gradeInput.isEmpty() || email.isEmpty()) {
+                            System.out.println("Error: All fields are required. Please try again.");
+                            break;
+                        }
+                        if (gradeInput.length() != 1 || !"ABCDFU".contains(gradeInput)) { // 'U' for unknown/unassigned
+                            System.out.println("Error: Invalid grade format. Please enter A, B, C, D, or F.");
+                            break;
+                        }
+                        if (!email.contains("@") || !email.contains(".")) {
+                            System.out.println("Warning: Email format seems invalid. Proceeding anyway, but please check.");
+                        }
+
+                        sms.addStudent(new Student(rollNum, name, gradeInput.charAt(0), email));
+                        break;
+
+                    case 2: // Remove Student
+                        System.out.print("Enter Roll Number of student to remove: ");
+                        String removeRollNum = scanner.nextLine().trim();
+                        if (removeRollNum.isEmpty()) {
+                            System.out.println("Error: Roll Number cannot be empty.");
+                        } else {
+                            sms.removeStudent(removeRollNum);
+                        }
+                        break;
+
+                    case 3: // Search Student
+                        System.out.print("Enter Name or Roll Number to search: ");
+                        String searchQuery = scanner.nextLine().trim();
+                        if (searchQuery.isEmpty()) {
+                            System.out.println("Error: Search query cannot be empty.");
+                        } else {
+                            List<Student> foundStudents = sms.searchStudent(searchQuery);
+                            for (Student s : foundStudents) {
+                                System.out.println(s);
+                            }
+                        }
+                        break;
+
+                    case 4: // Display All Students
+                        sms.displayAllStudents();
+                        break;
+
+                    case 5: // Edit Student
+                        System.out.print("Enter Roll Number of student to edit: ");
+                        String editRollNum = scanner.nextLine().trim();
+                        if (editRollNum.isEmpty()) {
+                            System.out.println("Error: Roll Number cannot be empty.");
+                        } else {
+                            sms.editStudent(editRollNum, scanner); // Pass scanner for input during edit
+                        }
+                        break;
+
+                    case 6: // Save to File
+                        sms.saveStudentsToFile();
+                        break;
+
+                    case 7: // Load from File
+                        sms.loadStudentsFromFile();
+                        break;
+
+                    case 0: // Exit SMS
+                        System.out.println("Returning to Main Menu.");
+                        break;
+
+                    default:
+                        System.out.println("Invalid choice. Please enter a number from 0 to 7.");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter a number.");
+                scanner.nextLine(); // Consume invalid input
+                smsChoice = -1; // Keep loop going
+            }
+        } while (smsChoice != 0);
+    }
+}
