@@ -1,0 +1,34 @@
+package JavaJingMing;
+
+import java.util.Random; // Import the Random class
+import java.util.Scanner; // Still useful for user input for range
+
+public class CodSoftT1 {
+
+    public static void generateRandomNumber(int min, int max) {
+        if (min > max) {
+            System.out.println("Error: Minimum value cannot be greater than maximum value.");
+            return; // Exit if the range is invalid
+        }
+
+        Random random = new Random();
+        // Generates a random integer between min (inclusive) and max (inclusive)
+        int randomNumber = random.nextInt((max - min) + 1) + min;
+
+        System.out.println("Generated random number between " + min + " and " + max + ": " + randomNumber);
+    }
+
+    public static void main(String[] args) {
+        Scanner s = new Scanner(System.in);
+
+        System.out.println("Enter the minimum number for the range:");
+        int minRange = s.nextInt();
+
+        System.out.println("Enter the maximum number for the range:");
+        int maxRange = s.nextInt();
+
+        generateRandomNumber(minRange, maxRange); // Call the method to generate and print
+
+        s.close(); // Close the scanner to release resources
+    }
+}
