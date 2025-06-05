@@ -1,0 +1,45 @@
+package JavaJingMing;
+
+import java.util.Random;
+import java.util.Scanner;
+
+public class CodSoftT1 {
+
+    public static void guessTheNumberGame(int min, int max) {
+        if (min > max) {
+            System.out.println("Oops! The minimum value can't be greater than the maximum value. Please try again.");
+            return;
+        }
+
+        Random random = new Random();
+        int randomNumber = random.nextInt((max - min) + 1) + min;
+
+        Scanner s = new Scanner(System.in); // Create scanner inside the game method
+        System.out.println("\nI've generated a random number between " + min + " and " + max + ". Can you guess what it is?");
+
+        System.out.print("Enter your guess: ");
+        int userGuess = s.nextInt();
+
+        // For now, we'll just show the guess. Later, you can add logic to check if it's correct.
+        System.out.println("You guessed: " + userGuess);
+        System.out.println("The actual number was: " + randomNumber); // Revealing for testing purposes
+
+        s.close(); // Close the scanner when done with it in this method
+    }
+
+    public static void main(String[] args) {
+        Scanner s = new Scanner(System.in); // Main method scanner for range input
+
+        System.out.println("Let's set up the guessing game range!");
+        System.out.print("Enter the minimum number for the range: ");
+        int minRange = s.nextInt();
+
+        System.out.print("Enter the maximum number for the range: ");
+        int maxRange = s.nextInt();
+
+        // Call the game method with the user-defined range
+        guessTheNumberGame(minRange, maxRange);
+
+        s.close(); // Close the main method's scanner
+    }
+}
